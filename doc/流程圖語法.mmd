@@ -1,0 +1,36 @@
+---
+config:
+  theme: neutral
+  look: classic
+---
+graph TD
+    subgraph 連線管理流程
+        A[連線請求] --> B{檢查連線狀態}
+        B -->|未連線| C[建立連線]
+        C --> D{檢查是否有未完成的斷線紀錄}
+        D -->|有| E[DatabaseManager.UpdateReconnection]
+        D -->|無| F[僅建立連線]
+        B -->|已連線| G[關閉連線]
+        G --> H[計算連線時間]
+        H --> I[DatabaseManager.LogDisconnection]
+    end
+    subgraph 資料處理流程
+        J[統計請求] --> K[DatabaseManager.GetAdvancedStatistics]
+        K --> L[建立 StatisticsData]
+        L --> M[載入 ConnectionLog]
+        M --> N[計算統計指標]
+        N -->|基本統計| O[計算總斷線次數/平均時間]
+        N -->|分布統計| P[計算每小時分布]
+        N -->|原因分析| Q[統計斷線原因]
+    end
+    subgraph 資料模型關係
+        R[StatisticsData] -->|包含| S[ConnectionLogs]
+        S -->|記錄| T[斷線時間]
+        S -->|記錄| U[重連時間]
+        S -->|記錄| V[斷線原因]
+        S -->|記錄| W[持續時間]
+    end
+    E --> X[更新資料庫]
+    I --> X
+    X --> Y[SQLite 資料庫]
+    Y --> M

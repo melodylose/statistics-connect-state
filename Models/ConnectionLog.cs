@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,11 @@ namespace StatisticsConnectStateApp.Models
         public DateTime DisconnectTime { get; set; }
 
         /// <summary>
+        /// 獲取或設置重新連接的時間。
+        /// </summary>
+        public DateTime? ReconnectTime { get; set; }
+
+        /// <summary>
         /// 獲取或設置斷開連接的原因。
         /// </summary>
         public string Reason { get; set; }
@@ -30,5 +35,10 @@ namespace StatisticsConnectStateApp.Models
         /// 獲取或設置斷開連接前的連接持續時間。
         /// </summary>
         public TimeSpan Duration { get; set; }
+
+        /// <summary>
+        /// 獲取或設置離線持續時間。
+        /// </summary>
+        public TimeSpan? OfflineDuration { get; set; }
     }
 }

@@ -1,0 +1,48 @@
+---
+config:
+  theme: neutral
+---
+sequenceDiagram
+    participant Client
+    participant DBManager as DatabaseManager
+    participant Stats as StatisticsData
+    participant Log as ConnectionLog
+    participant DB as SQLite Database
+    rect rgb(200, 220, 240)
+        note over Client,DB: 連線管理流程
+        Client->>DBManager: 建立連線請求
+        alt 建立新連線
+            Client->>DBManager: UpdateReconnection(DateTime)
+            DBManager->>DB: 檢查未完成的斷線紀錄
+            DB-->>DBManager: 返回檢查結果
+            alt 有未完成的斷線紀錄
+                DBManager->>DB: 更新重連時間
+                DB-->>DBManager: 更新成功
+            else 無未完成紀錄
+                DBManager-->>Client: 僅建立連線
+            end
+            DBManager-->>Client: 連線成功
+        else 關閉連線
+            Client->>DBManager: LogDisconnection(DateTime, reason, duration)
+            DBManager->>Log: 建立新的連線日誌
+            DBManager->>DB: 儲存連線日誌
+            DB-->>DBManager: 儲存成功
+            DBManager-->>Client: 斷線完成
+        end
+    end
+    rect rgb(220, 240, 200)
+        note over Client,DB: 統計資料查詢流程
+        Client->>DBManager: GetAdvancedStatistics(startDate, endDate)
+        DBManager->>Stats: 建立統計資料物件
+        DBManager->>DB: 查詢連線日誌
+        DB-->>DBManager: 返回日誌資料
+        loop 對每個連線記錄
+            DBManager->>Log: 建立連線日誌物件
+            DBManager->>Stats: 添加日誌到統計資料
+        end
+        DBManager->>Stats: 計算基本統計(總次數/平均時間)
+        DBManager->>Stats: 計算時間分布
+        DBManager->>Stats: 計算斷線原因統計
+        Stats-->>DBManager: 返回完整統計結果
+        DBManager-->>Client: 返回統計資料
+    end

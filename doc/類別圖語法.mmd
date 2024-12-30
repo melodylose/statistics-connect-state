@@ -1,0 +1,38 @@
+classDiagram
+    class DatabaseManager {
+        -string _connectionString
+        -static DatabaseManager _instance
+        +static DatabaseManager Instance
+        -DatabaseManager()
+        -void InitializeDatabase()
+        +StatisticsData GetAdvancedStatistics(DateTime startDate, DateTime endDate)
+        +void LogDisconnection(DateTime disconnectTime, string reason, TimeSpan duration)
+        +void UpdateReconnection(DateTime reconnectTime)
+    }
+
+    class StatisticsData {
+        +List<ConnectionLog> Logs
+        +int TotalDisconnects
+        +TimeSpan AverageDuration
+        +TimeSpan MaxDuration
+        +TimeSpan MinDuration
+        +Dictionary<string,int> DisconnectReasonCounts
+        +Dictionary<string,double> HourlyDistribution
+        +double StandardDeviation
+        +int DisconnectsLastWeek
+        +double WeekOverWeekChange
+        +StatisticsData()
+    }
+
+    class ConnectionLog {
+        +int Id
+        +DateTime DisconnectTime
+        +DateTime? ReconnectTime
+        +string Reason
+        +TimeSpan Duration
+        +TimeSpan? OfflineDuration
+    }
+
+    DatabaseManager --> StatisticsData : creates
+    DatabaseManager --> ConnectionLog : manages
+    StatisticsData --> ConnectionLog : contains

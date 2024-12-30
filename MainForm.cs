@@ -1,4 +1,4 @@
-﻿using NModbus;
+using NModbus;
 using StatisticsConnectStateApp.Extensions;
 using StatisticsConnectStateApp.Models;
 using System;
@@ -43,6 +43,9 @@ namespace StatisticsConnectStateApp
                         _client.ReceiveTimeout = 500;
                         _client.SendTimeout = 500;
                         _client.Connect("127.0.0.1", 502);
+
+                        // 記錄重新連接時間
+                        DatabaseManager.Instance.UpdateReconnection(DateTime.Now);
                     }
 
                     // 更新按鈕文字
